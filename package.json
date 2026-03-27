@@ -1,18 +1,17 @@
 {
   "name": "html-to-image-api",
-  "version": "1.0.0",
-  "description": "Free self-hosted HTML/CSS to Image API — drop-in replacement for HCTI",
+  "version": "2.0.0",
+  "description": "Free self-hosted HTML/CSS to Image API",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
+    "start": "node server.js"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
     "express": "^4.21.0",
-    "node-html-to-image": "^4.0.0",
+    "puppeteer": "^21.0.0",
     "cors": "^2.8.5",
     "uuid": "^9.0.0"
   }
