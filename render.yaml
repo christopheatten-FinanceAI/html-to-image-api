@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: html-to-image-api
+    runtime: docker
+    plan: free
+    envVars:
+      - key: API_KEY
+        generateValue: true
+      - key: BASE_URL
+        value: https://html-to-image-api.onrender.com
