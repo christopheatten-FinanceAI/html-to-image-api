@@ -1,0 +1,56 @@
+{
+ "slides": [
+  {
+   "kind": "cover",
+   "eyebrow": "Evaluate · Claude for finance",
+   "title": "60 pages to a 1-page board brief in 5 Claude steps",
+   "sub": "Five steps. Decisions first. Every point checkable."
+  },
+  {
+   "kind": "step",
+   "n": "01",
+   "title": "Upload it, then set the reader",
+   "body": "“Board members with five minutes and no technical background” is a different brief from “the CFO”.",
+   "tip": "The reader shapes the summary."
+  },
+  {
+   "kind": "step",
+   "n": "02",
+   "title": "Ask for decisions first",
+   "body": "Decided. Needs a decision. Risks. Next steps.",
+   "tip": "Boards want choices, not chapters."
+  },
+  {
+   "kind": "step",
+   "n": "03",
+   "title": "Demand page references",
+   "body": "A page number behind every key point.",
+   "tip": "A summary you can check beats one you have to trust."
+  },
+  {
+   "kind": "step",
+   "n": "04",
+   "title": "Ask what's missing",
+   "body": "“What would a sceptical board member ask that this document doesn't answer?”",
+   "tip": "Often the most valuable output."
+  },
+  {
+   "kind": "step",
+   "n": "05",
+   "title": "Edit and verify",
+   "body": "Check every figure and reference against the source. Cut anything that sounds like marketing.",
+   "tip": "You own the final brief."
+  },
+  {
+   "kind": "rule",
+   "title": "One rule",
+   "body": "Only upload documents your data policy allows in the tool you use. Confidential board material belongs in an approved enterprise setup."
+  },
+  {
+   "kind": "cta",
+   "title": "Get the 6 prompts",
+   "body": "Free. The link is in the post.",
+   "sub": "No signup."
+  }
+ ]
+}

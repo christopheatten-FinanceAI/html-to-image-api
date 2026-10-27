@@ -1,0 +1,105 @@
+{
+ "music": true,
+ "bpm": 112,
+ "scenes": [
+  {
+   "kind": "number",
+   "bg": "navy",
+   "kicker": "The AI business case says:",
+   "value": 2000,
+   "format": "comma",
+   "caption": "hours saved a year"
+  },
+  {
+   "kind": "statement",
+   "bg": "red",
+   "lines": [
+    "Where did",
+    "the hours"
+   ],
+   "highlight": "go?"
+  },
+  {
+   "kind": "maths",
+   "bg": "paper",
+   "kicker": "Do the maths",
+   "lines": [
+    "2,000 hours",
+    "÷ 20 people",
+    "= 100 hours each",
+    "÷ ~220 working days"
+   ],
+   "result": "≈ 27 min a day",
+   "note": "Spread across a day, it disappears."
+  },
+  {
+   "kind": "versus",
+   "bg": "navy",
+   "top": "Hours saved",
+   "bottom": "Hours freed",
+   "sub": "They get absorbed by:",
+   "pills": [
+    "Meetings",
+    "Other tasks",
+    "The next deadline"
+   ]
+  },
+  {
+   "kind": "metric",
+   "bg": "navy2",
+   "counter": "Metric 1/3",
+   "dots": [
+    1,
+    3
+   ],
+   "title": "Cycle time",
+   "text": "Did the close get faster?",
+   "bars": [
+    {
+     "label": "Before",
+     "value": 1.0
+    },
+    {
+     "label": "After",
+     "value": 0.62,
+     "tone": "teal"
+    }
+   ]
+  },
+  {
+   "kind": "grid",
+   "bg": "navy",
+   "title": "Risk reduced",
+   "text": "More reviewed, more caught.",
+   "cells": 50,
+   "marked": [
+    4,
+    13,
+    27,
+    31,
+    46
+   ],
+   "legend": [
+    "reviewed",
+    "exceptions caught"
+   ],
+   "note": "Better documentation for the regulator."
+  },
+  {
+   "kind": "strike",
+   "bg": "teal",
+   "pre": "Stop selling AI as a",
+   "struck": "time saver.",
+   "post": "Sell a better",
+   "big": "finance function.",
+   "note": "And measure it like one."
+  },
+  {
+   "kind": "end",
+   "variant": "book",
+   "bg": "navy",
+   "kicker": "Want the full playbook?",
+   "sub": "Generative AI for Finance Leaders"
+  }
+ ]
+}
