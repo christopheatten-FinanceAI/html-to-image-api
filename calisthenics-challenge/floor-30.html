@@ -1,0 +1,335 @@
+<title>Floor 30 Challenge</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a training log — progress strip up top, then four week blocks of day rows that open into the session card, tests and form guide below. */
+:root {
+  --bg: #eef1ee;
+  --surface: #ffffff;
+  --ink: #18211d;
+  --muted: #5b6862;
+  --line: #d3dad5;
+  --accent: #2346c8;
+  --accent-soft: #e2e8fb;
+  --done: #1d7a55;
+  --done-soft: #dcefe5;
+  --mark: #f2d33a;
+  --f-display: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111613; --surface: #19201c; --ink: #e6ece8; --muted: #93a19a; --line: #2c3631;
+    --accent: #8ea6ff; --accent-soft: #1f2846; --done: #5fd39f; --done-soft: #173527; --mark: #e8c92e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111613; --surface: #19201c; --ink: #e6ece8; --muted: #93a19a; --line: #2c3631;
+  --accent: #8ea6ff; --accent-soft: #1f2846; --done: #5fd39f; --done-soft: #173527; --mark: #e8c92e;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 64px;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 36px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 800; letter-spacing: 0.01em; text-wrap: balance; margin: 0; line-height: 1.05; }
+h1 { font-size: clamp(2.6rem, 9vw, 4rem); text-transform: uppercase; }
+h1 span { color: var(--accent); }
+h2 { font-size: 1.7rem; text-transform: uppercase; }
+h3 { font-size: 1.2rem; text-transform: uppercase; }
+p { margin: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+header { display: flex; flex-direction: column; gap: 12px; }
+.lede { color: var(--muted); max-width: 60ch; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-family: var(--f-mono); font-size: 0.75rem; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+
+/* progress strip */
+.progress { display: flex; flex-direction: column; gap: 10px; }
+.strip { display: grid; grid-template-columns: repeat(30, 1fr); gap: 3px; }
+.strip i { height: 22px; background: var(--line); border-radius: 2px; }
+.strip i.done { background: var(--done); }
+.strip i.next { background: var(--mark); }
+.strip i.wk { margin-right: 4px; }
+.pstats { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pstats b { color: var(--ink); }
+
+/* weeks */
+.week { display: flex; flex-direction: column; gap: 10px; }
+.week-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 2px solid var(--ink); padding-bottom: 6px; }
+.week-head p { color: var(--muted); font-size: 0.9rem; }
+.days { display: flex; flex-direction: column; gap: 6px; }
+details.day { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+details.day.is-done { background: var(--done-soft); border-color: transparent; }
+details.day.is-next { border-color: var(--ink); box-shadow: inset 4px 0 0 var(--mark); }
+summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 52px 1fr auto; align-items: center; gap: 12px; padding: 10px 12px; }
+summary::-webkit-details-marker { display: none; }
+summary:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dnum { font-family: var(--f-display); font-weight: 800; font-size: 1.9rem; line-height: 1; text-align: center; font-variant-numeric: tabular-nums; }
+.dnum small { display: block; font-family: var(--f-mono); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.1em; color: var(--muted); }
+.dmeta { min-width: 0; display: flex; flex-direction: column; }
+.dtitle { font-weight: 600; }
+.dsub { color: var(--muted); font-size: 0.82rem; }
+.tag { font-family: var(--f-mono); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; background: var(--accent-soft); color: var(--accent); justify-self: end; white-space: nowrap; }
+.is-done .tag { background: transparent; color: var(--done); }
+.dbody { padding: 4px 14px 16px; display: flex; flex-direction: column; gap: 12px; border-top: 1px dashed var(--line); }
+.dbody .note { font-size: 0.88rem; color: var(--muted); padding-top: 10px; }
+.ex { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.ex li { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.ex li:last-child { border-bottom: none; }
+.ex .dose { font-family: var(--f-mono); font-size: 0.85rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ex .cue { display: block; font-size: 0.8rem; color: var(--muted); }
+.btn { font: 600 0.9rem var(--f-body); padding: 10px 16px; border-radius: 6px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--bg); cursor: pointer; align-self: flex-start; }
+.btn.undo { background: transparent; color: var(--ink); }
+
+/* tests + guide */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.tests { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+td input { width: 76px; font: 500 0.95rem var(--f-mono); padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--ink); }
+td.gain { font-family: var(--f-mono); color: var(--done); font-weight: 500; }
+.rules { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+.guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 22px; }
+.guide div { min-width: 0; }
+.guide b { display: block; }
+.guide span { font-size: 0.86rem; color: var(--muted); }
+@media (max-width: 480px) {
+  summary { grid-template-columns: 42px 1fr; }
+  summary .tag { grid-column: 2; justify-self: start; }
+  .strip i { height: 16px; }
+  .strip i.wk { margin-right: 2px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  details.day[open] .dbody { animation: drop .18s ease-out; }
+  @keyframes drop { from { opacity: .4; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">30 days · no equipment · beginner</div>
+    <h1>Floor <span>30</span></h1>
+    <p class="lede">A 15-minute daily bodyweight plan that takes you from incline push-ups to your first clean full push-ups, with stronger legs, back and core along the way. Open a day, do the session, tap Done.</p>
+    <div class="facts">
+      <span class="chip">≈15 min / day</span>
+      <span class="chip">4 training days + 1 circuit / week</span>
+      <span class="chip">Test on day 1 and day 30</span>
+    </div>
+  </header>
+
+  <section class="progress" aria-label="Progress">
+    <div class="strip" id="strip"></div>
+    <div class="pstats"><span><b id="doneCount">0</b> / 30 days done</span><span>Next up: <b id="nextLabel">Day 1</b></span></div>
+  </section>
+
+  <div id="weeks" class="wrap" style="gap:32px"></div>
+
+  <section class="panel">
+    <h2>Before you start</h2>
+    <ol class="rules">
+      <li>Every session opens with the 2-minute warm-up: 30s arm circles, 30s leg swings, 30s hip circles, 30s marching in place.</li>
+      <li>Rest 45–60 seconds between sets. Finish each set with 1–2 reps still in the tank; clean form beats extra reps.</li>
+      <li>Can't hit the numbers? Repeat the previous week's dose. Too easy? Slow the lowering phase to 3 seconds.</li>
+      <li>Missed a day? Do the next one on your list. Don't stack two sessions to catch up.</li>
+      <li>Sharp or joint pain means stop. Normal muscle soreness in week 1 fades by week 2.</li>
+    </ol>
+  </section>
+
+  <section class="panel">
+    <h2>Your test results</h2>
+    <p class="lede">Record your baseline on day 1 and test again on day 30. Values stay in this browser.</p>
+    <div class="tests">
+      <table>
+        <thead><tr><th>Test</th><th>Day 1</th><th>Day 30</th><th>Change</th></tr></thead>
+        <tbody id="testRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Form guide</h2>
+    <div class="guide" id="guide"></div>
+  </section>
+</div>
+
+<script>
+const W = [
+  { name: "Foundation", focus: "Learn the moves. Moderate volume, slow and controlled." },
+  { name: "Build", focus: "More reps, lower push-up angle, longer holds." },
+  { name: "Strength", focus: "Knee push-ups, push-up negatives, single-leg work." },
+  { name: "Peak", focus: "First full push-ups, longest holds, test week." }
+];
+
+const A = [ // Push & core
+  [["Incline push-up (hands on table)", "3 × 8"], ["Glute bridge", "3 × 12"], ["Dead bug", "3 × 6 / side"], ["Forearm plank", "3 × 20s"]],
+  [["Incline push-up (hands on chair seat)", "3 × 10"], ["Glute bridge", "3 × 15"], ["Dead bug", "3 × 8 / side"], ["Forearm plank", "3 × 30s"], ["Shoulder taps (from knees)", "2 × 10"]],
+  [["Knee push-up", "4 × 8"], ["Push-up negative (5s down)", "2 × 3"], ["Single-leg glute bridge", "3 × 8 / leg"], ["Dead bug", "3 × 10 / side"], ["Forearm plank", "3 × 40s"]],
+  [["Full push-up", "3 × max clean (aim 3–5)"], ["Knee push-up (right after)", "3 × 6"], ["Single-leg glute bridge", "3 × 10 / leg"], ["Tuck hollow hold", "3 × 20s"], ["Forearm plank", "3 × 45s"]]
+];
+const B = [ // Legs & back
+  [["Bodyweight squat", "3 × 10"], ["Reverse lunge", "3 × 6 / leg"], ["Superman hold", "3 × 15s"], ["Prone Y-raise", "3 × 8"], ["Side plank (knees down)", "2 × 15s / side"]],
+  [["Bodyweight squat", "3 × 15"], ["Reverse lunge", "3 × 8 / leg"], ["Superman hold", "3 × 20s"], ["Prone Y-T raise", "3 × 8 each"], ["Side plank (knees down)", "2 × 25s / side"]],
+  [["Tempo squat (3s down)", "3 × 12"], ["Split squat", "3 × 8 / leg"], ["Superman hold", "3 × 30s"], ["Prone Y-T-W raise", "3 × 6 each"], ["Side plank (full)", "2 × 20s / side"]],
+  [["Tempo squat (3s down)", "3 × 15"], ["Split squat", "3 × 10 / leg"], ["Wall sit", "2 × 45s"], ["Prone Y-T-W raise", "3 × 8 each"], ["Side plank (full)", "2 × 30s / side"]]
+];
+const Cdose = [
+  { r: 2, on: 30, off: 30, push: "Incline push-up" },
+  { r: 3, on: 30, off: 30, push: "Incline push-up" },
+  { r: 3, on: 40, off: 20, push: "Knee push-up" },
+  { r: 3, on: 45, off: 15, push: "Knee push-up" }
+];
+function circuit(w) {
+  const d = Cdose[w];
+  const dose = `${d.on}s on / ${d.off}s off`;
+  return [["Bodyweight squat", dose], [d.push, dose], ["Slow mountain climber", dose], ["Glute bridge", dose], ["High-knee march (or jog)", dose]];
+}
+const MOB = [["Cat-cow", "10 slow reps"], ["World's greatest stretch", "5 / side"], ["Deep squat hold (hold a door frame)", "3 × 20s"], ["Half-kneeling hip flexor stretch", "30s / side"], ["Thoracic open book", "8 / side"], ["Brisk walk", "20 min"]];
+const TESTS = [
+  ["Push-ups in a row (note version: incline / knee / full)", "pu"],
+  ["Squats in 60 seconds", "sq"],
+  ["Forearm plank hold (seconds)", "pl"],
+  ["Superman hold (seconds)", "sm"]
+];
+const testList = [["Max push-ups (your hardest clean version)", "1 set"], ["Max squats", "60s"], ["Forearm plank", "max hold"], ["Superman hold", "max hold"]];
+
+const CUES = {
+  "Incline push-up": "Body in one straight line, chest to the edge, elbows about 45° from your sides.",
+  "Knee push-up": "Straight line from knees to head. Chest touches the floor, hips don't sag.",
+  "Full push-up": "Squeeze glutes and brace your abs. Only count reps where your chest nearly touches the floor.",
+  "Push-up negative": "Start at the top of a full push-up, lower for 5 seconds, then drop to your knees to come back up.",
+  "Glute bridge": "Push through your heels, squeeze glutes at the top for 1 second. Ribs stay down.",
+  "Single-leg glute bridge": "One foot planted, the other leg straight. Keep hips level.",
+  "Dead bug": "Lower back pressed into the floor. Extend the opposite arm and leg slowly.",
+  "Forearm plank": "Elbows under shoulders, glutes tight. Stop when your hips start to sag.",
+  "Tuck hollow hold": "Lower back flat on the floor, knees tucked toward chest, shoulders lifted.",
+  "Shoulder taps": "From a knee plank, tap the opposite shoulder without rocking your hips.",
+  "Bodyweight squat": "Feet shoulder-width, sit between your heels, chest up, knees track over toes.",
+  "Tempo squat": "Three-second count on the way down, normal speed up.",
+  "Reverse lunge": "Step back, lower the back knee toward the floor, push through the front heel.",
+  "Split squat": "Staggered stance, stay in place and move straight up and down.",
+  "Wall sit": "Back flat on the wall, thighs parallel to the floor.",
+  "Superman hold": "Face down, lift arms, chest and legs a few centimetres. Look at the floor.",
+  "Prone Y-raise": "Face down, thumbs up, lift arms in a Y. Squeeze your shoulder blades. T = arms out wide, W = elbows bent.",
+  "Side plank": "Hips stacked and lifted, body straight from head to knees (or feet).",
+  "Slow mountain climber": "Hands under shoulders, drive one knee at a time, keep hips low."
+};
+function cueFor(name) {
+  const key = Object.keys(CUES).sort((a, b) => b.length - a.length).find(k => name.startsWith(k));
+  return key ? CUES[key] : "";
+}
+
+// 7-day cycle: A, B, Mobility, Circuit, A, B, Rest
+const CYCLE = ["A", "B", "M", "C", "A", "B", "R"];
+const days = [];
+for (let n = 1; n <= 30; n++) {
+  const w = Math.min(3, Math.floor((n - 1) / 7));
+  let type = n >= 29 ? (n === 29 ? "C" : "T") : CYCLE[(n - 1) % 7];
+  let d;
+  if (n === 1) d = { title: "Baseline test + Push & core", tag: "Test", note: "Do the 4 tests first and write the results in the table below. Rest 2 minutes, then do the session.", ex: testList.concat(A[0].slice(0, 2)) };
+  else if (type === "T") d = { title: "Final test", tag: "Test", note: "Warm up, then repeat the 4 tests from day 1 with 2 minutes rest between each. Compare in the table below.", ex: testList };
+  else if (type === "A") d = { title: "Push & core", tag: "Strength", note: "Rest 45–60s between sets.", ex: A[w] };
+  else if (type === "B") d = { title: "Legs & back", tag: "Strength", note: "Rest 45–60s between sets.", ex: B[w] };
+  else if (type === "C") d = { title: "Conditioning circuit", tag: "Circuit", note: `${Cdose[w].r} rounds. Move straight from one exercise to the next on the timer. Rest 1 minute between rounds.`, ex: circuit(w) };
+  else if (type === "M") d = { title: "Mobility + walk", tag: "Recovery", note: "Easy pace. This is active recovery, so don't push it.", ex: MOB };
+  else d = { title: "Rest day", tag: "Rest", note: "Take a relaxed walk if you feel like it. Sleep and hydration count as training today.", ex: [["Optional easy walk", "20–30 min"]] };
+  d.n = n; d.w = w;
+  days.push(d);
+}
+
+const store = {
+  get(k, f) { try { const v = localStorage.getItem(k); return v === null ? f : JSON.parse(v); } catch (e) { return f; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+let done = new Set(store.get("f30-done", []));
+let tests = store.get("f30-tests", {});
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+function render() {
+  const next = days.find(d => !done.has(d.n));
+  const weeksEl = document.getElementById("weeks");
+  const openNow = new Set([...document.querySelectorAll("details.day[open]")].map(e => +e.dataset.n));
+  weeksEl.innerHTML = "";
+  const groups = [[0, 7], [7, 14], [14, 21], [21, 30]];
+  groups.forEach(([s, e], wi) => {
+    const sec = document.createElement("section");
+    sec.className = "week";
+    sec.innerHTML = `<div class="week-head"><h2>Week ${wi + 1} · ${W[wi].name}</h2><p>${W[wi].focus}</p></div><div class="days"></div>`;
+    const list = sec.querySelector(".days");
+    days.slice(s, e).forEach(d => {
+      const isDone = done.has(d.n), isNext = next && next.n === d.n;
+      const el = document.createElement("details");
+      el.className = "day" + (isDone ? " is-done" : "") + (isNext ? " is-next" : "");
+      el.dataset.n = d.n;
+      if (openNow.has(d.n) || (openNow.size === 0 && isNext && !render.started)) el.open = true;
+      const exs = d.ex.map(([name, dose]) => {
+        const cue = cueFor(name);
+        return `<li><span>${esc(name)}${cue ? `<span class="cue">${esc(cue)}</span>` : ""}</span><span class="dose">${esc(dose)}</span></li>`;
+      }).join("");
+      el.innerHTML = `<summary>
+          <div class="dnum"><small>DAY</small>${d.n}</div>
+          <div class="dmeta"><span class="dtitle">${esc(d.title)}</span><span class="dsub">${isDone ? "Done ✓" : isNext ? "Up next" : d.ex.length + " exercises"}</span></div>
+          <span class="tag">${isDone ? "Done" : d.tag}</span>
+        </summary>
+        <div class="dbody">
+          <p class="note">2-min warm-up first. ${esc(d.note)}</p>
+          <ul class="ex">${exs}</ul>
+          <button type="button" class="btn${isDone ? " undo" : ""}" id="btn-${d.n}" data-n="${d.n}">${isDone ? "Mark as not done" : "Done · Day " + d.n}</button>
+        </div>`;
+      list.appendChild(el);
+    });
+    weeksEl.appendChild(sec);
+  });
+  render.started = true;
+
+  const strip = document.getElementById("strip");
+  strip.innerHTML = days.map(d => `<i class="${done.has(d.n) ? "done" : next && next.n === d.n ? "next" : ""}${[7, 14, 21].includes(d.n) ? " wk" : ""}" title="Day ${d.n}"></i>`).join("");
+  document.getElementById("doneCount").textContent = done.size;
+  document.getElementById("nextLabel").textContent = next ? `Day ${next.n} · ${next.title}` : "Challenge complete";
+}
+
+document.getElementById("weeks").addEventListener("click", e => {
+  const b = e.target.closest("button[data-n]");
+  if (!b) return;
+  const n = +b.dataset.n;
+  if (done.has(n)) done.delete(n); else done.add(n);
+  store.set("f30-done", [...done]);
+  if (done.has(n)) {
+    const cur = document.querySelector(`details.day[data-n="${n}"]`);
+    if (cur) cur.open = false;
+  }
+  render();
+});
+
+function renderTests() {
+  document.getElementById("testRows").innerHTML = TESTS.map(([label, k]) => {
+    const a = tests[k + "1"] ?? "", b = tests[k + "30"] ?? "";
+    const g = a !== "" && b !== "" ? (b - a >= 0 ? "+" : "") + (b - a) : "–";
+    return `<tr><td>${esc(label)}</td>
+      <td><input id="t-${k}1" data-k="${k}1" type="number" min="0" inputmode="numeric" value="${esc(a)}" aria-label="${esc(label)} day 1"></td>
+      <td><input id="t-${k}30" data-k="${k}30" type="number" min="0" inputmode="numeric" value="${esc(b)}" aria-label="${esc(label)} day 30"></td>
+      <td class="gain">${g}</td></tr>`;
+  }).join("");
+}
+document.getElementById("testRows").addEventListener("change", e => {
+  const k = e.target.dataset.k; if (!k) return;
+  const v = e.target.value.trim();
+  if (v === "") delete tests[k]; else tests[k] = Number(v);
+  store.set("f30-tests", tests);
+  renderTests();
+});
+
+document.getElementById("guide").innerHTML = Object.entries(CUES).map(([k, v]) => `<div><b>${esc(k)}</b><span>${esc(v)}</span></div>`).join("");
+render();
+renderTests();
+</script>
