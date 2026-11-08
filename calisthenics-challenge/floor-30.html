@@ -83,7 +83,22 @@ summary:focus-visible, button:focus-visible, input:focus-visible { outline: 2px 
 .dbody { padding: 4px 14px 16px; display: flex; flex-direction: column; gap: 12px; border-top: 1px dashed var(--line); }
 .dbody .note { font-size: 0.88rem; color: var(--muted); padding-top: 10px; }
 .ex { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.ex li { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.ex li { display: grid; grid-template-columns: 80px 1fr auto; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); align-items: center; }
+.exname { min-width: 0; }
+.mini { display: block; width: 80px; aspect-ratio: 112 / 70; max-width: 100%; background: var(--bg); border-radius: 4px; }
+.fig { display: block; width: 100%; height: auto; }
+.fig path { fill: none; stroke: var(--ink); stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+.fig path.far { stroke: var(--muted); stroke-width: 3; opacity: 0.75; }
+.fig path.floor { stroke: var(--line); stroke-width: 2; }
+.fig path.prop { stroke: var(--muted); stroke-width: 2.4; }
+.fig circle { fill: var(--ink); }
+.fig .f2 { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .mini .f1 { animation: fa 2.6s ease-in-out infinite; }
+  .mini .f2 { animation: fb 2.6s ease-in-out infinite; }
+}
+@keyframes fa { 0%, 42% { opacity: 1; } 50%, 92% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes fb { 0%, 42% { opacity: 0; } 50%, 92% { opacity: 1; } 100% { opacity: 0; } }
 .ex li:last-child { border-bottom: none; }
 .ex .dose { font-family: var(--f-mono); font-size: 0.85rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .ex .cue { display: block; font-size: 0.8rem; color: var(--muted); }
@@ -99,15 +114,22 @@ th { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.08em; text
 td input { width: 76px; font: 500 0.95rem var(--f-mono); padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--ink); }
 td.gain { font-family: var(--f-mono); color: var(--done); font-weight: 500; }
 .rules { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
-.guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 22px; }
-.guide div { min-width: 0; }
-.guide b { display: block; }
-.guide span { font-size: 0.86rem; color: var(--muted); }
+.guide { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 22px 22px; }
+.gcard { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.gcard b { display: block; margin-top: 4px; }
+.gcard > span { font-size: 0.86rem; color: var(--muted); }
+.gfigs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.gfigs figure { margin: 0; background: var(--bg); border-radius: 6px; padding: 4px 4px 2px; min-width: 0; }
+.gfigs figure:only-child { grid-column: 1 / -1; max-width: 50%; }
+.gfigs figcaption { font-family: var(--f-mono); font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); text-align: center; }
 @media (max-width: 480px) {
   summary { grid-template-columns: 42px 1fr; }
   summary .tag { grid-column: 2; justify-self: start; }
   .strip i { height: 16px; }
   .strip i.wk { margin-right: 2px; }
+  .ex li { grid-template-columns: 72px 1fr; row-gap: 2px; }
+  .ex .dose { grid-column: 2; }
+  .ex .mini { grid-row: span 2; width: 72px; }
 }
 @media (prefers-reduced-motion: no-preference) {
   details.day[open] .dbody { animation: drop .18s ease-out; }
@@ -202,30 +224,94 @@ const TESTS = [
 ];
 const testList = [["Max push-ups (your hardest clean version)", "1 set"], ["Max squats", "60s"], ["Forearm plank", "max hold"], ["Superman hold", "max hold"]];
 
-const CUES = {
-  "Incline push-up": "Body in one straight line, chest to the edge, elbows about 45° from your sides.",
-  "Knee push-up": "Straight line from knees to head. Chest touches the floor, hips don't sag.",
-  "Full push-up": "Squeeze glutes and brace your abs. Only count reps where your chest nearly touches the floor.",
-  "Push-up negative": "Start at the top of a full push-up, lower for 5 seconds, then drop to your knees to come back up.",
-  "Glute bridge": "Push through your heels, squeeze glutes at the top for 1 second. Ribs stay down.",
-  "Single-leg glute bridge": "One foot planted, the other leg straight. Keep hips level.",
-  "Dead bug": "Lower back pressed into the floor. Extend the opposite arm and leg slowly.",
-  "Forearm plank": "Elbows under shoulders, glutes tight. Stop when your hips start to sag.",
-  "Tuck hollow hold": "Lower back flat on the floor, knees tucked toward chest, shoulders lifted.",
-  "Shoulder taps": "From a knee plank, tap the opposite shoulder without rocking your hips.",
-  "Bodyweight squat": "Feet shoulder-width, sit between your heels, chest up, knees track over toes.",
-  "Tempo squat": "Three-second count on the way down, normal speed up.",
-  "Reverse lunge": "Step back, lower the back knee toward the floor, push through the front heel.",
-  "Split squat": "Staggered stance, stay in place and move straight up and down.",
-  "Wall sit": "Back flat on the wall, thighs parallel to the floor.",
-  "Superman hold": "Face down, lift arms, chest and legs a few centimetres. Look at the floor.",
-  "Prone Y-raise": "Face down, thumbs up, lift arms in a Y. Squeeze your shoulder blades. T = arms out wide, W = elbows bent.",
-  "Side plank": "Hips stacked and lifted, body straight from head to knees (or feet).",
-  "Slow mountain climber": "Hands under shoulders, drive one knee at a time, keep hips low."
+// Stick-figure poses, side view. Joints: h head, s shoulder, hp hip, k/f near knee/foot, e/w near elbow/hand.
+// k2/f2/e2/w2 are the far limbs (drawn lighter); c bends the spine. Floor is y=74.
+const PU_T = { h: [92, 49], s: [86, 52], hp: [65, 60], k: [51, 66], f: [36, 72], e: [86, 62], w: [86, 72] };
+const PU_B = { h: [93, 64], s: [86, 66], hp: [65, 69], k: [51, 70], f: [36, 72], e: [79, 60], w: [86, 72] };
+const KN_T = { h: [92, 49], s: [86, 52], hp: [65, 64], k: [51, 72], f: [37, 65], e: [86, 62], w: [86, 72] };
+const KN_B = { h: [93, 64], s: [86, 66], hp: [65, 69], k: [51, 72], f: [37, 65], e: [79, 60], w: [86, 72] };
+const INC_T = { h: [70, 35], s: [65, 40], hp: [48, 54], k: [36, 64], f: [24, 74], e: [71, 48], w: [78, 55] };
+const INC_B = { h: [76, 43], s: [70, 47], hp: [51, 58], k: [38, 66], f: [24, 74], e: [64, 53], w: [78, 55] };
+const ST = { h: [60, 15], s: [60, 22], hp: [60, 44], k: [61, 59], f: [60, 74], e: [61, 33], w: [62, 43] };
+const SQ_B = { h: [62, 34], s: [60, 41], hp: [53, 62], k: [68, 60], f: [60, 74], e: [70, 41], w: [81, 40] };
+const LU_B = { h: [60, 23], s: [60, 30], hp: [60, 52], k: [74, 58], f: [74, 74], k2: [56, 67], f2: [40, 72], e: [61, 41], w: [62, 50] };
+const SS_A = { ...ST, k: [67, 58], f: [74, 74], k2: [55, 59], f2: [42, 72] };
+const GB_A = { h: [23, 69], s: [30, 70], hp: [52, 70], k: [64, 58], f: [74, 72], e: [40, 72], w: [50, 72] };
+const GB_B = { h: [23, 69], s: [30, 70], hp: [50, 58], k: [66, 56], f: [74, 72], e: [40, 72], w: [50, 72] };
+const DB_A = { h: [23, 69], s: [30, 70], hp: [54, 70], k: [54, 55], f: [70, 55], e: [30, 60], w: [30, 49] };
+const DB_B = { ...DB_A, e: [21, 62], w: [12, 57], e2: [30, 60], w2: [30, 49], k2: [69, 67], f2: [85, 64] };
+const PL = { h: [93, 59], s: [86, 62], hp: [65, 66], k: [51, 69], f: [36, 72], e: [86, 72], w: [98, 72] };
+const HO = { h: [28, 58], s: [34, 63], hp: [56, 70], k: [50, 54], f: [64, 52], e: [44, 61], w: [54, 60] };
+const WS = { h: [43, 33], s: [43, 40], hp: [43, 60], k: [60, 60], f: [60, 74], e: [49, 50], w: [56, 58] };
+const SM_A = { h: [93, 68], s: [86, 70], hp: [64, 70], k: [49, 71], f: [34, 71], e: [98, 71], w: [110, 71] };
+const SM_B = { h: [92, 61], s: [85, 65], hp: [64, 71], k: [49, 68], f: [35, 64], e: [97, 60], w: [108, 54] };
+const Y_B = { h: [92, 64], s: [85, 67], hp: [64, 71], k: [49, 71], f: [34, 71], e: [97, 63], w: [108, 58] };
+const SP = { h: [92, 55], s: [86, 58], hp: [65, 64], k: [51, 68], f: [36, 72], e: [86, 72], w: [98, 72], e2: [76, 54], w2: [67, 60] };
+const MC_B = { ...PU_T, hp: [65, 58], k: [77, 64], f: [66, 71], k2: [51, 66], f2: [36, 72] };
+const MA = { ...ST, k: [74, 47], f: [72, 62], k2: [61, 59], f2: [60, 74], e: [55, 32], w: [52, 41], e2: [66, 31], w2: [72, 24] };
+const MB = { ...ST, k: [61, 59], f: [60, 74], k2: [74, 47], f2: [72, 62], e: [66, 31], w: [72, 24], e2: [55, 32], w2: [52, 41] };
+const CAT = { h: [90, 60], s: [84, 52], hp: [58, 52], c: [71, 38], k: [58, 72], f: [42, 72], e: [84, 62], w: [84, 72] };
+const COW = { h: [92, 45], s: [84, 54], hp: [58, 52], c: [71, 64], k: [58, 72], f: [42, 72], e: [84, 63], w: [84, 72] };
+const WG_A = { h: [72, 41], s: [66, 46], hp: [48, 60], k: [66, 60], f: [68, 74], k2: [34, 66], f2: [20, 72], e: [63, 59], w: [60, 72] };
+const WG_B = { ...WG_A, e2: [68, 34], w2: [70, 22] };
+const DS = { h: [62, 40], s: [60, 47], hp: [54, 68], k: [68, 60], f: [60, 74], e: [71, 47], w: [82, 45] };
+const HF_A = { h: [52, 27], s: [52, 34], hp: [52, 56], k: [68, 56], f: [68, 74], k2: [46, 72], f2: [30, 72], e: [56, 45], w: [60, 54] };
+const HF_B = { h: [57, 29], s: [57, 36], hp: [57, 58], k: [72, 57], f: [68, 74], k2: [46, 72], f2: [30, 72], e: [61, 47], w: [64, 55] };
+
+const PROPS = {
+  table: '<path class="prop" d="M74 55.5H106M80 55.5V74M100 55.5V74"/>',
+  wall: '<path class="prop" d="M37 8V74"/>',
+  door: '<path class="prop" d="M85 8V74"/>'
 };
-function cueFor(name) {
-  const key = Object.keys(CUES).sort((a, b) => b.length - a.length).find(k => name.startsWith(k));
-  return key ? CUES[key] : "";
+
+const EX = [
+  { key: "Incline push-up", frames: [INC_T, INC_B], prop: "table", cue: "Body in one straight line, chest to the edge, elbows about 45° from your sides." },
+  { key: "Knee push-up", frames: [KN_T, KN_B], cue: "Straight line from knees to head. Chest touches the floor, hips don't sag." },
+  { key: "Full push-up", match: ["Full push-up", "Max push-ups"], frames: [PU_T, PU_B], cue: "Squeeze glutes and brace your abs. Only count reps where your chest nearly touches the floor." },
+  { key: "Push-up negative", frames: [PU_T, PU_B], labels: ["Start", "5 seconds down"], cue: "Start at the top of a full push-up, lower for 5 seconds, then drop to your knees to come back up." },
+  { key: "Shoulder taps", frames: [KN_T, { ...KN_T, e: [78, 60], w: [84, 54], e2: [86, 62], w2: [86, 72] }], cue: "From a knee plank, tap the opposite shoulder without rocking your hips." },
+  { key: "Forearm plank", frames: [PL], cue: "Elbows under shoulders, glutes tight. Stop when your hips start to sag." },
+  { key: "Side plank", frames: [SP], cue: "Lie on your side, elbow under shoulder. Hips stacked and lifted, body straight from head to knees (or feet)." },
+  { key: "Dead bug", frames: [DB_A, DB_B], cue: "Lower back pressed into the floor. Extend the opposite arm and leg slowly." },
+  { key: "Tuck hollow hold", frames: [HO], cue: "Lower back flat on the floor, knees tucked toward chest, shoulders lifted." },
+  { key: "Glute bridge", frames: [GB_A, GB_B], cue: "Push through your heels, squeeze glutes at the top for 1 second. Ribs stay down." },
+  { key: "Single-leg glute bridge", frames: [{ ...GB_A, k2: [64, 58], f2: [75, 47] }, { ...GB_B, k2: [63, 50], f2: [77, 42] }], cue: "One foot planted, the other leg straight. Keep hips level." },
+  { key: "Bodyweight squat", match: ["Bodyweight squat", "Max squats"], frames: [ST, SQ_B], cue: "Feet shoulder-width, sit between your heels, chest up, knees track over toes." },
+  { key: "Tempo squat", frames: [ST, SQ_B], labels: ["Start", "3 seconds down"], cue: "Three-second count on the way down, normal speed up." },
+  { key: "Reverse lunge", frames: [ST, LU_B], cue: "Step back, lower the back knee toward the floor, push through the front heel." },
+  { key: "Split squat", frames: [SS_A, LU_B], cue: "Staggered stance, stay in place and move straight up and down." },
+  { key: "Wall sit", frames: [WS], prop: "wall", cue: "Back flat on the wall, thighs parallel to the floor." },
+  { key: "Superman hold", frames: [SM_A, SM_B], labels: ["Start", "Hold"], cue: "Face down, lift arms, chest and legs a few centimetres. Look at the floor." },
+  { key: "Prone Y-T-W raise", match: ["Prone Y"], frames: [SM_A, Y_B], cue: "Face down, legs relaxed, thumbs up. Lift arms in a Y (overhead), T (out wide) or W (elbows bent) and squeeze your shoulder blades." },
+  { key: "Slow mountain climber", frames: [PU_T, MC_B], cue: "Hands under shoulders, drive one knee at a time, keep hips low." },
+  { key: "High-knee march", frames: [MA, MB], labels: ["Left", "Right"], cue: "Drive each knee to hip height and swing the opposite arm. Jog it once that feels easy." },
+  { key: "Cat-cow", frames: [CAT, COW], labels: ["Cat", "Cow"], cue: "On hands and knees. Round your back up and tuck your chin, then let your belly drop and look forward." },
+  { key: "World's greatest stretch", frames: [WG_A, WG_B], cue: "Deep lunge, both hands down inside your front foot. Rotate and reach the arm on the front-leg side to the ceiling." },
+  { key: "Deep squat hold", frames: [DS], prop: "door", cue: "Hold a door frame, sink as low as you can with heels down, chest up." },
+  { key: "Half-kneeling hip flexor stretch", frames: [HF_A, HF_B], cue: "Back knee on the floor. Squeeze that glute and shift your hips forward until you feel the front of the hip stretch." },
+  { key: "Thoracic open book", frames: [], cue: "Lie on your side, knees bent and stacked. Sweep the top arm up and over to the other side, following your hand with your eyes." }
+];
+function findEx(name) {
+  let best = null, len = 0;
+  EX.forEach(x => (x.match || [x.key]).forEach(m => {
+    if (name.startsWith(m) && m.length > len) { best = x; len = m.length; }
+  }));
+  return best;
+}
+function cueFor(name) { const x = findEx(name); return x ? x.cue : ""; }
+
+const L = pts => "M" + pts.map(p => p.join(" ")).join("L");
+function pose(p, cls) {
+  const torso = p.c ? `M${p.hp.join(" ")}Q${p.c.join(" ")} ${p.s.join(" ")}` : L([p.hp, p.s]);
+  const far = L([p.hp, p.k2 || p.k, p.f2 || p.f]) + L([p.s, p.e2 || p.e, p.w2 || p.w]);
+  const near = L([p.hp, p.k, p.f]) + torso + L([p.s, p.e, p.w]) + L([p.s, p.h]);
+  return `<g class="${cls}"><path class="far" d="${far}"/><path d="${near}"/><circle cx="${p.h[0]}" cy="${p.h[1]}" r="4.6"/></g>`;
+}
+function svgFor(x, which) {
+  let body;
+  if (which === "anim") body = x.frames.length === 1 ? pose(x.frames[0], "") : pose(x.frames[0], "f1") + pose(x.frames[1], "f2");
+  else body = pose(x.frames[which], "");
+  return `<svg class="fig" viewBox="4 8 112 70" aria-hidden="true"><path class="floor" d="M4 75H116"/>${PROPS[x.prop] || ""}${body}</svg>`;
 }
 
 // 7-day cycle: A, B, Mobility, Circuit, A, B, Rest
@@ -273,8 +359,10 @@ function render() {
       el.dataset.n = d.n;
       if (openNow.has(d.n) || (openNow.size === 0 && isNext && !render.started)) el.open = true;
       const exs = d.ex.map(([name, dose]) => {
-        const cue = cueFor(name);
-        return `<li><span>${esc(name)}${cue ? `<span class="cue">${esc(cue)}</span>` : ""}</span><span class="dose">${esc(dose)}</span></li>`;
+        const x = findEx(name);
+        const cue = x ? x.cue : "";
+        const fig = x && x.frames.length ? `<span class="mini">${svgFor(x, "anim")}</span>` : `<span class="mini empty"></span>`;
+        return `<li>${fig}<span class="exname">${esc(name)}${cue ? `<span class="cue">${esc(cue)}</span>` : ""}</span><span class="dose">${esc(dose)}</span></li>`;
       }).join("");
       el.innerHTML = `<summary>
           <div class="dnum"><small>DAY</small>${d.n}</div>
@@ -329,7 +417,13 @@ document.getElementById("testRows").addEventListener("change", e => {
   renderTests();
 });
 
-document.getElementById("guide").innerHTML = Object.entries(CUES).map(([k, v]) => `<div><b>${esc(k)}</b><span>${esc(v)}</span></div>`).join("");
+document.getElementById("guide").innerHTML = EX.map(x => {
+  const labels = x.labels || (x.frames.length === 1 ? ["Hold"] : ["Start", "End"]);
+  const figs = x.frames.length
+    ? `<div class="gfigs">${x.frames.map((f, i) => `<figure>${svgFor(x, i)}<figcaption>${esc(labels[i])}</figcaption></figure>`).join("")}</div>`
+    : "";
+  return `<div class="gcard">${figs}<b>${esc(x.key)}</b><span>${esc(x.cue)}</span></div>`;
+}).join("");
 render();
 renderTests();
 </script>
