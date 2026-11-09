@@ -94,8 +94,8 @@ summary:focus-visible, button:focus-visible, input:focus-visible { outline: 2px 
 .fig circle { fill: var(--ink); }
 .fig .f2 { opacity: 0; }
 @media (prefers-reduced-motion: no-preference) {
-  .mini .f1 { animation: fa 2.6s ease-in-out infinite; }
-  .mini .f2 { animation: fb 2.6s ease-in-out infinite; }
+  .mini .f1, .pfig .f1 { animation: fa 2.6s ease-in-out infinite; }
+  .mini .f2, .pfig .f2 { animation: fb 2.6s ease-in-out infinite; }
 }
 @keyframes fa { 0%, 42% { opacity: 1; } 50%, 92% { opacity: 0; } 100% { opacity: 1; } }
 @keyframes fb { 0%, 42% { opacity: 0; } 50%, 92% { opacity: 1; } 100% { opacity: 0; } }
@@ -131,6 +131,52 @@ td.gain { font-family: var(--f-mono); color: var(--done); font-weight: 500; }
   .ex .dose { grid-column: 2; }
   .ex .mini { grid-row: span 2; width: 72px; }
 }
+/* actions + rest picker */
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn.ghost { background: transparent; color: var(--ink); }
+.btn.start { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.btn:disabled { opacity: 0.35; cursor: default; }
+.restpick { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+.seg { display: inline-flex; border: 1.5px solid var(--ink); border-radius: 6px; overflow: hidden; }
+.seg button { font: 600 0.9rem var(--f-mono); padding: 8px 16px; border: 0; background: transparent; color: var(--ink); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+/* workout timer */
+.player {
+  position: fixed; inset: 0; z-index: 50; overflow-y: auto;
+  --pbg: var(--surface); --pc: var(--accent);
+  background: var(--pbg); transition: background-color 0.25s;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 14px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.player[data-phase="Rest"], .player[data-phase="Done"] { --pbg: var(--done-soft); --pc: var(--done); }
+.player[data-phase="Warm-up"] { --pbg: var(--accent-soft); }
+.player[data-phase="Test"] { --pc: var(--ink); }
+.pinner { max-width: 540px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; gap: 14px; }
+.ptop { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ptools { display: flex; gap: 6px; }
+.tbtn { font: 500 0.8rem var(--f-body); padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); cursor: pointer; }
+.pbar { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.pbar i { display: block; height: 100%; background: var(--pc); }
+.pmain { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; }
+.phase { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; padding: 4px 12px; border-radius: 999px; background: var(--pc); color: var(--surface); }
+.pname { font-size: clamp(2rem, 7vw, 2.8rem); }
+.pset { color: var(--muted); font-weight: 500; }
+.pfig { width: min(280px, 80%); background: var(--bg); border-radius: 10px; padding: 6px; }
+.pfig.dim { opacity: 0.55; }
+.ptime { font-family: var(--f-display); font-weight: 800; font-size: clamp(4.5rem, 22vw, 7.5rem); line-height: 1; font-variant-numeric: tabular-nums; color: var(--pc); }
+.ptime.reps { font-size: clamp(2.4rem, 11vw, 4rem); }
+.pstep { width: min(320px, 90%); height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.pstep i { display: block; height: 100%; width: 0; background: var(--pc); }
+.pcue { max-width: 44ch; color: var(--muted); font-size: 0.9rem; }
+.pnext { text-align: center; color: var(--muted); font-size: 0.9rem; }
+.pctrl { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
+.pctrl .btn { align-self: stretch; padding: 14px 8px; }
+.pctrl .wide { grid-column: span 2; }
+.pfoot { text-align: center; font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
 @media (prefers-reduced-motion: no-preference) {
   details.day[open] .dbody { animation: drop .18s ease-out; }
   @keyframes drop { from { opacity: .4; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
@@ -160,11 +206,14 @@ td.gain { font-family: var(--f-mono); color: var(--done); font-weight: 500; }
     <h2>Before you start</h2>
     <ol class="rules">
       <li>Every session opens with the 2-minute warm-up: 30s arm circles, 30s leg swings, 30s hip circles, 30s marching in place.</li>
-      <li>Rest 45–60 seconds between sets. Finish each set with 1–2 reps still in the tank; clean form beats extra reps.</li>
+      <li>Strength days use straight sets: do set 1 of the first exercise, rest 45–60s, set 2, rest, set 3, then rest once more and move to the next exercise. The timer walks you through it.</li>
+      <li>The circuit day is different: one round is every exercise back to back on the timer, with only a short switch between them. Take a 1-minute break, then start the next round.</li>
+      <li>Finish each set with 1–2 reps still in the tank. Clean form beats extra reps.</li>
       <li>Can't hit the numbers? Repeat the previous week's dose. Too easy? Slow the lowering phase to 3 seconds.</li>
       <li>Missed a day? Do the next one on your list. Don't stack two sessions to catch up.</li>
       <li>Sharp or joint pain means stop. Normal muscle soreness in week 1 fades by week 2.</li>
     </ol>
+    <div class="restpick"><span>Break between sets in the timer</span><div class="seg" id="restSeg"><button type="button" id="rest45" data-rest="45">45s</button><button type="button" id="rest60" data-rest="60">60s</button></div></div>
   </section>
 
   <section class="panel">
@@ -183,6 +232,8 @@ td.gain { font-family: var(--f-mono); color: var(--done); font-weight: 500; }
     <div class="guide" id="guide"></div>
   </section>
 </div>
+
+<div id="player" class="player" role="dialog" aria-modal="true" aria-label="Workout timer" hidden></div>
 
 <script>
 const W = [
@@ -323,12 +374,12 @@ for (let n = 1; n <= 30; n++) {
   let d;
   if (n === 1) d = { title: "Baseline test + Push & core", tag: "Test", note: "Do the 4 tests first and write the results in the table below. Rest 2 minutes, then do the session.", ex: testList.concat(A[0].slice(0, 2)) };
   else if (type === "T") d = { title: "Final test", tag: "Test", note: "Warm up, then repeat the 4 tests from day 1 with 2 minutes rest between each. Compare in the table below.", ex: testList };
-  else if (type === "A") d = { title: "Push & core", tag: "Strength", note: "Rest 45–60s between sets.", ex: A[w] };
-  else if (type === "B") d = { title: "Legs & back", tag: "Strength", note: "Rest 45–60s between sets.", ex: B[w] };
+  else if (type === "A") d = { title: "Push & core", tag: "Strength", note: "Straight sets: all sets of one exercise with a 45–60s break between them, then on to the next exercise.", ex: A[w] };
+  else if (type === "B") d = { title: "Legs & back", tag: "Strength", note: "Straight sets: all sets of one exercise with a 45–60s break between them, then on to the next exercise.", ex: B[w] };
   else if (type === "C") d = { title: "Conditioning circuit", tag: "Circuit", note: `${Cdose[w].r} rounds. Move straight from one exercise to the next on the timer. Rest 1 minute between rounds.`, ex: circuit(w) };
   else if (type === "M") d = { title: "Mobility + walk", tag: "Recovery", note: "Easy pace. This is active recovery, so don't push it.", ex: MOB };
   else d = { title: "Rest day", tag: "Rest", note: "Take a relaxed walk if you feel like it. Sleep and hydration count as training today.", ex: [["Optional easy walk", "20–30 min"]] };
-  d.n = n; d.w = w;
+  d.n = n; d.w = w; d.type = n === 1 ? "T1" : type;
   days.push(d);
 }
 
@@ -372,7 +423,10 @@ function render() {
         <div class="dbody">
           <p class="note">2-min warm-up first. ${esc(d.note)}</p>
           <ul class="ex">${exs}</ul>
-          <button type="button" class="btn${isDone ? " undo" : ""}" id="btn-${d.n}" data-n="${d.n}">${isDone ? "Mark as not done" : "Done · Day " + d.n}</button>
+          <div class="actions">
+            <button type="button" class="btn start" id="start-${d.n}" data-start="${d.n}">▶ Start timer · ~${Math.max(1, Math.round(estimate(buildSteps(d)) / 60))} min</button>
+            <button type="button" class="btn ghost" id="btn-${d.n}" data-n="${d.n}">${isDone ? "Mark as not done" : "Mark done"}</button>
+          </div>
         </div>`;
       list.appendChild(el);
     });
@@ -387,6 +441,8 @@ function render() {
 }
 
 document.getElementById("weeks").addEventListener("click", e => {
+  const st = e.target.closest("button[data-start]");
+  if (st) { openPlayer(+st.dataset.start); return; }
   const b = e.target.closest("button[data-n]");
   if (!b) return;
   const n = +b.dataset.n;
@@ -424,6 +480,242 @@ document.getElementById("guide").innerHTML = EX.map(x => {
     : "";
   return `<div class="gcard">${figs}<b>${esc(x.key)}</b><span>${esc(x.cue)}</span></div>`;
 }).join("");
+/* ---------- Workout timer ---------- */
+let restPref = store.get("f30-rest", 45);
+const WARM = [["Arm circles", 30], ["Leg swings", 30], ["Hip circles", 30], ["March in place", 30]];
+
+function parseDose(dose) {
+  const m = dose.match(/^(\d+)\s*×\s*(.+)$/);
+  const sets = m ? +m[1] : 1, per = m ? m[2] : dose;
+  const side = /\/\s*(side|leg)/.test(per);
+  if (/max hold/.test(per)) return { sets, side, mode: "watch" };
+  const t = per.match(/^(\d+)s\b/);
+  if (t) return { sets, side, mode: "time", secs: +t[1] };
+  const mm = per.match(/^(\d+)(?:–\d+)?\s*min/);
+  if (mm) return { sets, side, mode: "time", secs: +mm[1] * 60 };
+  return { sets, side, mode: "reps", label: /^\d+$/.test(per) ? per + " reps" : per };
+}
+function restStep(secs, name) { return { phase: "Rest", name: name || "Rest", mode: "time", secs }; }
+function addExercise(steps, name, dose, restSecs, phase) {
+  const p = parseDose(dose);
+  const label = phase === "Test" && p.mode === "reps" ? "Max clean reps" : p.label;
+  for (let s = 1; s <= p.sets; s++) {
+    const set = p.sets > 1 ? `Set ${s} of ${p.sets}` : "";
+    if (p.mode === "time" && p.side) {
+      ["Left side", "Right side"].forEach(sd => steps.push({ phase, name, mode: "time", secs: p.secs, setText: set ? `${set} · ${sd}` : sd }));
+    } else {
+      steps.push({ phase, name, mode: p.mode, secs: p.secs, label, setText: set });
+    }
+    if (s < p.sets && restSecs) steps.push(restStep(restSecs));
+  }
+}
+function addList(steps, list, restSecs, phase) {
+  list.forEach(([name, dose], i) => {
+    if (i && restSecs) steps.push(restStep(restSecs));
+    addExercise(steps, name, dose, restSecs, phase || "Work");
+  });
+}
+function buildSteps(d) {
+  const steps = [];
+  if (["A", "B", "C", "T", "T1"].includes(d.type)) {
+    WARM.forEach(([name, secs]) => steps.push({ phase: "Warm-up", name, mode: "time", secs }));
+    steps.push(restStep(10, "Get ready"));
+  }
+  if (d.type === "A" || d.type === "B") addList(steps, d.ex, restPref);
+  else if (d.type === "C") {
+    const c = Cdose[d.w];
+    for (let r = 1; r <= c.r; r++) {
+      d.ex.forEach(([name], i) => {
+        steps.push({ phase: "Work", name, mode: "time", secs: c.on, setText: `Round ${r} of ${c.r}` });
+        if (i < d.ex.length - 1) steps.push(restStep(c.off, "Switch"));
+        else if (r < c.r) steps.push(restStep(60, "Round break"));
+      });
+    }
+  }
+  else if (d.type === "M") addList(steps, d.ex, 15);
+  else if (d.type === "T") addList(steps, testList, 120, "Test");
+  else if (d.type === "T1") { addList(steps, testList, 120, "Test"); steps.push(restStep(120)); addList(steps, A[0].slice(0, 2), restPref); }
+  else addList(steps, d.ex, 0);
+  steps.forEach((s, i) => { if (s.phase === "Rest") s.next = steps.slice(i + 1).find(t => t.phase !== "Rest"); });
+  return steps;
+}
+const stepSecs = s => s.mode === "time" ? s.secs : s.mode === "reps" ? 30 : 45;
+function estimate(steps) { return steps.reduce((t, s) => t + stepSecs(s), 0); }
+
+const PL_EL = document.getElementById("player");
+const P = { steps: [], i: 0, endAt: 0, rem: 0, paused: false, w0: 0, wAcc: 0, timer: null, beeped: null, wl: null, finished: false, t0: 0, sound: store.get("f30-sound", true) };
+let actx = null;
+function beep(freq, dur) {
+  if (!P.sound || !actx) return;
+  try {
+    if (actx.state === "suspended") actx.resume();
+    const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime;
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0.22, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(actx.destination);
+    o.start(t); o.stop(t + dur + 0.02);
+  } catch (e) {}
+}
+const cur = () => P.steps[P.i];
+const fmt = s => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+const msLeft = () => P.paused ? P.rem : P.endAt - Date.now();
+const watchMs = () => P.wAcc + (P.paused ? 0 : Date.now() - P.w0);
+
+function openPlayer(n) {
+  P.day = days[n - 1];
+  P.steps = buildSteps(P.day);
+  P.finished = false; P.t0 = Date.now();
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); } catch (e) {}
+  PL_EL.hidden = false;
+  document.body.style.overflow = "hidden";
+  try { if (navigator.wakeLock) navigator.wakeLock.request("screen").then(l => { P.wl = l; }).catch(() => {}); } catch (e) {}
+  enter(0);
+  clearInterval(P.timer);
+  P.timer = setInterval(tick, 200);
+}
+function closePlayer() {
+  clearInterval(P.timer);
+  PL_EL.hidden = true;
+  document.body.style.overflow = "";
+  try { if (P.wl) P.wl.release(); } catch (e) {}
+  P.wl = null;
+  const b = document.querySelector(`button[data-start="${P.day.n}"]`);
+  if (b) b.focus();
+}
+function enter(i) {
+  P.i = i; P.paused = false; P.beeped = null;
+  const s = cur();
+  if (s.mode === "time") { P.rem = s.secs * 1000; P.endAt = Date.now() + P.rem; }
+  if (s.mode === "watch") { P.wAcc = 0; P.w0 = Date.now(); }
+  draw();
+}
+function next() { if (P.i < P.steps.length - 1) enter(P.i + 1); else finish(); }
+function togglePause() {
+  const s = cur();
+  if (s.mode === "time") { if (P.paused) P.endAt = Date.now() + P.rem; else P.rem = P.endAt - Date.now(); }
+  else if (s.mode === "watch") { if (P.paused) P.w0 = Date.now(); else P.wAcc += Date.now() - P.w0; }
+  P.paused = !P.paused;
+  draw();
+}
+function addTime(sec) { if (P.paused) P.rem += sec * 1000; else P.endAt += sec * 1000; P.beeped = null; clock(); }
+function tick() {
+  if (PL_EL.hidden || P.finished) return;
+  const s = cur();
+  if (s.mode === "time" && !P.paused) {
+    const ms = P.endAt - Date.now(), r = Math.ceil(ms / 1000);
+    if (r >= 1 && r <= 3 && P.beeped !== r) { P.beeped = r; beep(660, 0.12); }
+    if (ms <= 0) { beep(s.phase === "Rest" ? 990 : 520, 0.4); next(); return; }
+  }
+  clock();
+}
+function remaining() {
+  let t = 0;
+  for (let i = P.i; i < P.steps.length; i++) {
+    const s = P.steps[i];
+    t += i === P.i && s.mode === "time" ? Math.max(0, msLeft()) / 1000 : stepSecs(s);
+  }
+  return t;
+}
+function clock() {
+  const s = cur();
+  const tEl = document.getElementById("ptime");
+  if (tEl) tEl.textContent = s.mode === "time" ? fmt(Math.ceil(msLeft() / 1000)) : fmt(Math.floor(watchMs() / 1000));
+  const bar = document.getElementById("pstepbar");
+  if (bar) bar.style.width = Math.min(100, Math.max(0, 100 * (1 - msLeft() / (s.secs * 1000)))) + "%";
+  const foot = document.getElementById("pfoot");
+  if (foot) foot.textContent = `About ${Math.max(1, Math.round(remaining() / 60))} min to go · step ${P.i + 1} of ${P.steps.length}`;
+}
+function figFor(name) { const x = findEx(name); return x && x.frames.length ? svgFor(x, "anim") : ""; }
+
+function draw() {
+  const s = cur(), isRest = s.phase === "Rest", show = isRest ? s.next : s;
+  PL_EL.dataset.phase = s.phase;
+  const fig = show ? figFor(show.name) : "";
+  const cue = isRest ? "" : cueFor(s.name);
+  const upNext = isRest ? null : P.steps.slice(P.i + 1).find(t => t.phase !== "Rest");
+  const sub = isRest ? (show ? `Next: ${show.name}${show.setText ? " · " + show.setText : ""}` : "") : (s.setText || "");
+  let big;
+  if (s.mode === "reps") big = `<div class="ptime reps">${esc(s.label)}</div>`;
+  else if (s.mode === "watch") big = `<div class="ptime" id="ptime"></div><p class="pset">Stopwatch running. Tap Stop when you can't hold any longer.</p>`;
+  else big = `<div class="ptime" id="ptime"></div><div class="pstep"><i id="pstepbar"></i></div>`;
+  const back = `<button type="button" class="btn ghost" data-act="back"${P.i === 0 ? " disabled" : ""}>Back</button>`;
+  const pause = `<button type="button" class="btn ghost" data-act="pause">${P.paused ? "Resume" : "Pause"}</button>`;
+  let ctrl;
+  if (s.mode === "reps") ctrl = back + `<button type="button" class="btn wide" data-act="skip" id="pmain">Done · next</button>`;
+  else if (s.mode === "watch") ctrl = back + pause + `<button type="button" class="btn" data-act="skip" id="pmain">Stop · next</button>`;
+  else if (isRest) ctrl = back + `<button type="button" class="btn ghost" data-act="plus">+15s</button>` + pause + `<button type="button" class="btn" data-act="skip" id="pmain">Skip</button>`;
+  else ctrl = back + pause + `<button type="button" class="btn" data-act="skip" id="pmain">Skip</button>`;
+  PL_EL.innerHTML = `<div class="pinner">
+    <div class="ptop"><span class="eyebrow">Day ${P.day.n} · ${esc(P.day.title)}</span>
+      <span class="ptools"><button type="button" class="tbtn" data-act="sound" aria-pressed="${P.sound}">Sound ${P.sound ? "on" : "off"}</button><button type="button" class="tbtn" data-act="close">Close</button></span></div>
+    <div class="pbar"><i style="width:${(100 * P.i / P.steps.length).toFixed(1)}%"></i></div>
+    <div class="pmain">
+      <span class="phase">${isRest ? "Break" : esc(s.phase)}</span>
+      <h2 class="pname">${esc(s.name)}</h2>
+      ${sub ? `<p class="pset">${esc(sub)}</p>` : ""}
+      ${fig ? `<div class="pfig${isRest ? " dim" : ""}">${fig}</div>` : ""}
+      ${big}
+      ${cue ? `<p class="pcue">${esc(cue)}</p>` : ""}
+    </div>
+    ${upNext ? `<p class="pnext">Up next: ${esc(upNext.name)}${upNext.setText ? " · " + esc(upNext.setText) : ""}</p>` : ""}
+    <div class="pctrl">${ctrl}</div>
+    <p class="pfoot" id="pfoot"></p>
+  </div>`;
+  clock();
+  const m = document.getElementById("pmain");
+  if (m) m.focus({ preventScroll: true });
+}
+function finish() {
+  P.finished = true;
+  clearInterval(P.timer);
+  beep(880, 0.2); setTimeout(() => beep(1175, 0.4), 230);
+  const mins = Math.max(1, Math.round((Date.now() - P.t0) / 60000));
+  const isDone = done.has(P.day.n);
+  PL_EL.dataset.phase = "Done";
+  PL_EL.innerHTML = `<div class="pinner">
+    <div class="ptop"><span class="eyebrow">Day ${P.day.n} · ${esc(P.day.title)}</span><span class="ptools"><button type="button" class="tbtn" data-act="close">Close</button></span></div>
+    <div class="pbar"><i style="width:100%"></i></div>
+    <div class="pmain"><span class="phase">Finished</span><h2 class="pname">Day ${P.day.n} complete</h2><p class="pset">Total time: ${mins} min</p></div>
+    <div class="pctrl">${isDone ? "" : `<button type="button" class="btn wide" data-act="mark" id="pmain">Mark day ${P.day.n} done</button>`}<button type="button" class="btn ghost" data-act="close">Close</button></div>
+  </div>`;
+  const m = document.getElementById("pmain");
+  if (m) m.focus({ preventScroll: true });
+}
+PL_EL.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]");
+  if (!b || b.disabled) return;
+  const a = b.dataset.act;
+  if (a === "close") closePlayer();
+  else if (a === "back") { if (P.i > 0) enter(P.i - 1); }
+  else if (a === "skip") next();
+  else if (a === "pause") togglePause();
+  else if (a === "plus") addTime(15);
+  else if (a === "sound") { P.sound = !P.sound; store.set("f30-sound", P.sound); draw(); }
+  else if (a === "mark") { done.add(P.day.n); store.set("f30-done", [...done]); render(); closePlayer(); }
+});
+document.addEventListener("keydown", e => {
+  if (PL_EL.hidden) return;
+  if (e.key === "Escape") closePlayer();
+  else if (P.finished) return;
+  else if (e.key === " " && e.target.tagName !== "BUTTON") { e.preventDefault(); cur().mode === "reps" ? next() : togglePause(); }
+  else if (e.key === "ArrowRight") next();
+  else if (e.key === "ArrowLeft" && P.i > 0) enter(P.i - 1);
+});
+
+function drawRestSeg() {
+  document.querySelectorAll("#restSeg button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.rest === restPref)));
+}
+document.getElementById("restSeg").addEventListener("click", e => {
+  const b = e.target.closest("button[data-rest]");
+  if (!b) return;
+  restPref = +b.dataset.rest;
+  store.set("f30-rest", restPref);
+  drawRestSeg();
+  render();
+});
+drawRestSeg();
+
 render();
 renderTests();
 </script>
