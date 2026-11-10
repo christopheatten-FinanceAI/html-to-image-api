@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fable 5.2 for Finance</title>
+<style>
+  :root{
+    --bg:#070b16; --panel:#0f1629; --panel2:#141d35; --line:#24304f;
+    --ink:#f4f6fb; --mute:#94a0bd; --coral:#ff8a5c; --gold:#ffc857;
+    --teal:#35e0c2; --blue:#5aa2ff; --grey:#55617f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1080px;height:1350px;overflow:hidden;background:var(--bg);
+    font-family:"Inter","Inter Display",system-ui,sans-serif;color:var(--ink);
+    -webkit-font-smoothing:antialiased}
+  #stage{position:relative;width:1080px;height:1350px;overflow:hidden}
+  .glow{position:absolute;border-radius:50%;filter:blur(120px);opacity:.55}
+  #g1{width:760px;height:760px;background:#ff6a3d;left:-260px;top:-300px}
+  #g2{width:820px;height:820px;background:#1c5cff;right:-340px;bottom:-360px}
+  #g3{width:520px;height:520px;background:#12c9a8;left:300px;top:520px;opacity:.16}
+  #grid{position:absolute;inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+    background-size:60px 60px}
+  #bar{position:absolute;left:0;top:0;height:8px;width:0;
+    background:linear-gradient(90deg,var(--coral),var(--gold),var(--teal));z-index:20}
+  #brand{position:absolute;left:64px;right:64px;bottom:34px;display:flex;
+    justify-content:space-between;font-size:22px;color:var(--mute);z-index:20;font-weight:500}
+  #brand b{color:var(--ink);font-weight:700}
+  .scene{position:absolute;inset:0;padding:70px 64px 120px;display:none;flex-direction:column;justify-content:center}
+  .scene>*{flex:none}
+  .scene>.kicker,.scene>.chip,.scene>.cta{align-self:flex-start}
+  .kicker{display:inline-block;font-size:24px;font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--coral);margin-bottom:16px}
+  h2{font-size:66px;line-height:1.04;font-weight:800;letter-spacing:-.025em;margin-bottom:34px}
+  h2 em{font-style:normal;color:var(--gold)}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+    border:1.5px solid var(--line);border-radius:26px}
+  .src{position:absolute;left:64px;right:64px;bottom:84px;font-size:19px;color:var(--mute)}
+
+  /* S1 */
+  #s1{text-align:left}
+  .chip{display:inline-flex;align-items:center;gap:12px;padding:12px 24px;border-radius:99px;
+    border:1.5px solid rgba(255,138,92,.55);background:rgba(255,138,92,.12);
+    font-size:26px;font-weight:700;letter-spacing:.08em;color:var(--coral)}
+  .dot{width:14px;height:14px;border-radius:50%;background:var(--coral)}
+  .mega{font-size:212px;font-weight:900;letter-spacing:-.055em;line-height:.92;margin:36px 0 10px}
+  .mega span{background:linear-gradient(95deg,#fff 10%,var(--gold) 55%,var(--coral));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub1{font-size:64px;font-weight:800;letter-spacing:-.025em;line-height:1.08}
+  .sub1 i{font-style:normal;color:var(--teal)}
+  .sub2{font-size:34px;color:var(--mute);margin-top:34px;font-weight:500;line-height:1.35}
+
+  /* S2 article */
+  .browser{overflow:hidden}
+  .bbar{display:flex;align-items:center;gap:12px;padding:20px 26px;border-bottom:1.5px solid var(--line);
+    background:rgba(255,255,255,.04)}
+  .bbar s{width:16px;height:16px;border-radius:50%;background:#3a4668;display:block}
+  .url{margin-left:14px;flex:1;background:#0a1020;border-radius:12px;padding:10px 20px;
+    font-size:22px;color:var(--mute)}
+  .url b{color:var(--ink);font-weight:600}
+  .art{padding:34px 40px 38px}
+  .art .date{font-size:21px;color:var(--mute);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+  .art p{font-size:38px;line-height:1.5;margin-top:34px;color:#dfe5f5;font-weight:500}
+  .art p small{display:block;font-size:22px;color:var(--mute);margin-top:6px;font-weight:500}
+  .hl{background-image:linear-gradient(rgba(255,200,87,.92),rgba(255,200,87,.92));
+    background-repeat:no-repeat;background-size:0% 100%;border-radius:6px;padding:2px 4px;margin:0 -4px;
+    -webkit-box-decoration-break:clone;box-decoration-break:clone}
+  .hl.t{background-image:linear-gradient(rgba(53,224,194,.9),rgba(53,224,194,.9))}
+
+  /* S3 dashboard */
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:22px}
+  .kpi{padding:24px 26px}
+  .kpi .l{font-size:21px;color:var(--mute);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .kpi .v{font-size:66px;font-weight:800;letter-spacing:-.03em;margin:8px 0 4px;white-space:nowrap}
+  .kpi .d{font-size:22px;color:var(--teal);font-weight:600}
+  .chart{padding:28px 30px 26px}
+  .chart .ttl{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  .chart .ttl b{font-size:28px}
+  .lg{display:flex;gap:20px;font-size:20px;color:var(--mute);font-weight:600}
+  .lg i{display:inline-block;width:16px;height:16px;border-radius:4px;margin-right:8px;vertical-align:-2px}
+  .grp{margin-top:18px}
+  .grp .n{font-size:23px;font-weight:700;margin-bottom:8px}
+  .grp .n span{color:var(--mute);font-weight:500}
+  .row{display:flex;align-items:center;height:27px;margin-bottom:5px}
+  .track{flex:1;height:100%;position:relative}
+  .b{height:100%;border-radius:0 8px 8px 0;width:0}
+  .b.f{background:linear-gradient(90deg,var(--coral),var(--gold))}
+  .b.g{background:var(--blue);opacity:.8}
+  .b.o{background:var(--grey)}
+  .row .num{width:96px;text-align:right;font-size:23px;font-weight:700;font-variant-numeric:tabular-nums}
+  .row.main .num{color:var(--gold);font-size:27px}
+  .row.main{height:34px}
+
+  /* S4 */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .voice{padding:28px 30px;min-height:290px}
+  .voice .who{font-size:23px;font-weight:700;color:var(--coral);letter-spacing:.05em;text-transform:uppercase}
+  .voice .big{font-size:92px;font-weight:900;letter-spacing:-.04em;line-height:1;margin:14px 0 12px;white-space:nowrap}
+  .voice .big small{font-size:40px;color:var(--mute);font-weight:700;letter-spacing:-.01em}
+  .voice .t{font-size:26px;line-height:1.3;color:#cfd7ec;font-weight:500}
+  .quote{margin-top:22px;padding:28px 34px;border-left:8px solid var(--teal)}
+  .quote q{font-size:35px;line-height:1.32;font-weight:700;quotes:"“" "”"}
+  .quote div{font-size:23px;color:var(--mute);margin-top:10px;font-weight:500}
+
+  /* S5 */
+  .trend{padding:26px 30px 14px}
+  .trend b{font-size:28px}
+  .trend .cap{font-size:21px;color:var(--mute);margin-top:4px;font-weight:500}
+  .gov{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+  .gv{padding:26px 24px;display:flex;gap:18px;align-items:flex-start}
+  .gv .ic{flex:none;width:52px;height:52px;border-radius:14px;background:rgba(53,224,194,.14);
+    border:1.5px solid rgba(53,224,194,.5);color:var(--teal);font-size:28px;font-weight:800;
+    display:flex;align-items:center;justify-content:center}
+  .gv b{font-size:25px;display:block;margin-bottom:3px}
+  .gv span{font-size:20.5px;color:var(--mute);line-height:1.3;font-weight:500;display:block}
+  .next{margin-top:18px;padding:26px 28px;font-size:30px;font-weight:700;line-height:1.3;
+    border-color:rgba(255,200,87,.55);background:rgba(255,200,87,.09)}
+  .next em{font-style:normal;color:var(--gold)}
+
+  /* S6 */
+  
+  .fin{font-size:92px;font-weight:900;letter-spacing:-.035em;line-height:1.03}
+  .fin em{font-style:normal;background:linear-gradient(95deg,var(--gold),var(--coral));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .cta{display:inline-block;margin-top:54px;padding:24px 44px;border-radius:99px;font-size:38px;font-weight:800;
+    color:#10131f;background:linear-gradient(95deg,var(--gold),var(--coral))}
+  .fin2{font-size:36px;color:var(--mute);margin-top:34px;font-weight:500;line-height:1.35}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="glow" id="g1"></div><div class="glow" id="g2"></div><div class="glow" id="g3"></div>
+  <div id="grid"></div>
+  <div id="bar"></div>
+
+  <!-- S1 HOOK -->
+  <section class="scene" id="s1" data-s="0" data-e="2.8">
+    <div class="chip" data-in="0.05"><span class="dot"></span>RELEASED NOV 9, 2026</div>
+    <div class="mega" data-in="0.2" data-fx="scale"><span>Fable 5.2</span></div>
+    <div class="sub1" data-in="0.75">What it changes for <i>finance</i><br>and <i>AI governance.</i></div>
+    <div class="sub2" data-in="1.3">20 seconds. Real numbers. No hype.</div>
+  </section>
+
+  <!-- S2 SOURCE -->
+  <section class="scene" id="s2" data-s="2.8" data-e="7.3">
+    <span class="kicker" data-in="2.9">From the launch post</span>
+    <h2 data-in="3.0">Read the <em>fine print.</em></h2>
+    <div class="card browser" data-in="3.15">
+      <div class="bbar"><s></s><s></s><s></s><div class="url">anthropic.com/<b>claude-fable-and-mythos-5-2</b></div></div>
+      <div class="art">
+        <div class="date">Anthropic · November 9, 2026 · excerpts</div>
+        <p>“Claude Fable and Claude Mythos are <span class="hl" data-hl="3.7">the same underlying model.</span>”</p>
+        <p>“They generate outputs <span class="hl t" data-hl="4.4">up to 30% faster</span> than Claude Fable 5.1 and Claude Mythos 5.1.”</p>
+        <p>“The model was also <span class="hl" data-hl="5.1">tested before release by external evaluators,</span> including the UK AI Security Institute…”</p>
+        <p>“It traced the answer to the right sources and <span class="hl t" data-hl="5.8">didn’t overstate what the evidence showed.</span>”
+          <small>— Ashish Malik, AI Researcher, Balyasny Asset Management</small></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S3 PERFORMANCE -->
+  <section class="scene" id="s3" data-s="7.3" data-e="11.8">
+    <span class="kicker" data-in="7.4">Performance dashboard</span>
+    <h2 data-in="7.5">More work. <em>20% cheaper.</em></h2>
+    <div class="kpis">
+      <div class="card kpi" data-in="7.7"><div class="l">Price / 1M tokens</div><div class="v">$8 · $40</div><div class="d">in · out — was $10 · $50</div></div>
+      <div class="card kpi" data-in="7.85"><div class="l">Output speed</div><div class="v"><span data-count="30" data-at="7.9">0</span>%</div><div class="d">up to, faster than 5.1</div></div>
+      <div class="card kpi" data-in="8.0"><div class="l">Subagents</div><div class="v"><span data-count="1000" data-at="8.05" data-sep="1">0</span>+</div><div class="d">coordinated on one job</div></div>
+    </div>
+    <div class="card chart" data-in="8.2">
+      <div class="ttl"><b>Knowledge-work benchmarks (%)</b>
+        <div class="lg"><span><i style="background:var(--gold)"></i>Fable 5.2</span><span><i style="background:var(--blue)"></i>GPT-6 Astra</span><span><i style="background:var(--grey)"></i>Fable 5.1</span></div></div>
+      <div id="bars"></div>
+    </div>
+    <div class="src">Vendor-reported by Anthropic, Nov 9 2026 · each model at highest available effort unless noted</div>
+  </section>
+
+  <!-- S4 FINANCE VOICES -->
+  <section class="scene" id="s4" data-s="11.8" data-e="16.0">
+    <span class="kicker" data-in="11.9">Why finance cares</span>
+    <h2 data-in="12.0">What <em>trading &amp; credit</em> teams report</h2>
+    <div class="g2">
+      <div class="card voice" data-in="12.25"><div class="who">IMC · quant research</div>
+        <div class="big"><span data-count="3" data-at="12.3">0</span> <small>of 4</small></div>
+        <div class="t">research problems hit new best scores</div></div>
+      <div class="card voice" data-in="12.45"><div class="who">Jump Trading</div>
+        <div class="big"><span data-count="10" data-at="12.5">0</span>% <small>lower</small></div>
+        <div class="t">error than the next best model, internal research benchmark</div></div>
+      <div class="card voice" data-in="12.65"><div class="who">Fundamental Research Labs</div>
+        <div class="big"><span data-count="91" data-at="12.7">0</span>% <small>vs 86%</small></div>
+        <div class="t">on their own eval versus the next best model</div></div>
+      <div class="card voice" data-in="12.85"><div class="who">Box · loan underwriting</div>
+        <div class="big" style="font-size:66px;margin:22px 0 16px">Caught it.</div>
+        <div class="t">Salary deposits and the bank statement’s balance didn’t match</div></div>
+    </div>
+    <div class="card quote" data-in="13.5"><q>That restraint makes clear what remains unknown.</q>
+      <div>Balyasny Asset Management, on investment research</div></div>
+    <div class="src">Customer statements published in Anthropic’s launch post · firms’ own internal evaluations</div>
+  </section>
+
+  <!-- S5 GOVERNANCE -->
+  <section class="scene" id="s5" data-s="16.0" data-e="20.3">
+    <span class="kicker" data-in="16.1">Where governance is heading</span>
+    <h2 data-in="16.2">From model risk to <em>agent risk.</em></h2>
+    <div class="card trend" data-in="16.4">
+      <b>Sandbox test: model used planted credentials</b>
+      <div class="cap">Lower is better · Mythos line, same underlying model as Fable</div>
+      <svg id="tsvg" width="892" height="250" viewBox="0 0 892 250"></svg>
+    </div>
+    <div class="gov">
+      <div class="card gv" data-in="17.3"><div class="ic">2</div><div><b>One model, two tiers</b><span>Fable: safeguards on, for everyone. Mythos: vetted organisations only.</span></div></div>
+      <div class="card gv" data-in="17.5"><div class="ic">✓</div><div><b>Tested before release</b><span>External evaluators incl. UK AI Security Institute and METR.</span></div></div>
+      <div class="card gv" data-in="17.7"><div class="ic">%</div><div><b>~55% fewer blocks</b><span>Safeguards as robust as 5.1, with fewer unnecessary refusals.</span></div></div>
+      <div class="card gv" data-in="17.9"><div class="ic">0</div><div><b>Zero data retention</b><span>Available to enterprises via Frontier Safeguards (beta).</span></div></div>
+    </div>
+    <div class="card next" data-in="18.4">For CFOs &amp; CROs: the control question shifts from <em>“is the answer right?”</em> to <em>“what was the agent allowed to do?”</em></div>
+  </section>
+
+  <!-- S6 OUTRO -->
+  <section class="scene" id="s6" data-s="20.3" data-e="22.6">
+    <div class="fin" data-in="20.4">Capability is no longer the bottleneck.<br><em data-in="20.9">Governance is.</em></div>
+    <div class="fin2" data-in="21.2">Is your control framework ready for agents<br>that work for 10+ hours on their own?</div>
+    <div class="cta" data-in="21.5" data-fx="scale">Follow for AI in Finance →</div>
+  </section>
+
+  <div id="brand"><span><b>AI in Finance</b></span><span>Source: anthropic.com · Nov 2026</span></div>
+</div>
+
+<script>
+const DURATION = 22.6;
+// ---- bar chart data (Anthropic launch post, Nov 9 2026) ----
+const BARS = [
+  ["Remote Labor Index", "real freelance projects", 41.3, 20.8, 17.9],
+  ["AA-Briefcase v1.1", "knowledge work", 66.1, 52.0, 61.5],
+  ["Chartography", "reading charts, no tools", 73.4, 71.0, 44.8],
+  ["OSWorld 2.1", "computer use", 89.3, 79.5, 83.5],
+];
+const bars = document.getElementById('bars');
+BARS.forEach((r, i) => {
+  const t0 = 8.5 + i * 0.28;
+  const row = (cls, v, main) =>
+    `<div class="row ${main ? 'main' : ''}"><div class="track"><div class="b ${cls}" data-bar="${v}" data-at="${t0}"></div></div>` +
+    `<div class="num" data-count="${v}" data-at="${t0}" data-dec="1">0</div></div>`;
+  bars.insertAdjacentHTML('beforeend',
+    `<div class="grp" data-in="${t0 - 0.1}"><div class="n">${r[0]} <span>· ${r[1]}</span></div>` +
+    row('f', r[2], true) + row('g', r[3]) + row('o', r[4]) + `</div>`);
+});
+
+// ---- trend chart ----
+const PTS = [["Mythos 5", 39], ["Mythos 5.1", 21], ["Mythos 5.2", 3.1]];
+const X = [110, 446, 782], Y = v => 196 - v / 45 * 160;
+let svg = '';
+[0, 20, 40].forEach(g => svg += `<line x1="60" x2="852" y1="${Y(g)}" y2="${Y(g)}" stroke="#24304f" stroke-width="1.5"/>` +
+  `<text x="48" y="${Y(g) + 7}" fill="#94a0bd" font-size="19" text-anchor="end" font-family="Inter">${g}%</text>`);
+const d = PTS.map((p, i) => (i ? 'L' : 'M') + X[i] + ' ' + Y(p[1])).join(' ');
+svg += `<defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#ff8a5c"/><stop offset="1" stop-color="#35e0c2"/></linearGradient></defs>`;
+svg += `<path id="tline" d="${d}" fill="none" stroke="url(#lg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`;
+PTS.forEach((p, i) => {
+  svg += `<g class="pt" data-at="${16.7 + i * 0.4}"><circle cx="${X[i]}" cy="${Y(p[1])}" r="12" fill="#070b16" stroke="${i == 2 ? '#35e0c2' : '#ff8a5c'}" stroke-width="6"/>` +
+    `<text x="${X[i] + (i == 2 ? 6 : 24)}" y="${Y(p[1]) + (i == 2 ? -30 : 6)}" text-anchor="${i == 2 ? 'middle' : 'start'}" fill="${i == 2 ? '#35e0c2' : '#f4f6fb'}" font-size="${i == 2 ? 44 : 34}" font-weight="800" font-family="Inter">${p[1]}%</text>` +
+    `<text x="${X[i]}" y="238" text-anchor="middle" fill="#94a0bd" font-size="21" font-weight="600" font-family="Inter">${p[0]}</text></g>`;
+});
+document.getElementById('tsvg').innerHTML = svg;
+const tline = document.getElementById('tline');
+const tlen = tline.getTotalLength();
+tline.style.strokeDasharray = tlen;
+
+// ---- timeline engine ----
+const clamp = x => Math.max(0, Math.min(1, x));
+const ease = x => 1 - Math.pow(1 - clamp(x), 3);
+const Q = s => [...document.querySelectorAll(s)];
+const scenes = Q('.scene'), ins = Q('[data-in]'), hls = Q('[data-hl]'),
+      brs = Q('[data-bar]'), cnts = Q('[data-count]'), pts = Q('.pt');
+
+window.seek = function (t) {
+  document.getElementById('bar').style.width = (t / DURATION * 1080) + 'px';
+  document.getElementById('g1').style.transform = `translate(${Math.sin(t * .5) * 70}px,${Math.cos(t * .4) * 50}px)`;
+  document.getElementById('g2').style.transform = `translate(${Math.cos(t * .45) * 80}px,${Math.sin(t * .35) * 60}px)`;
+  document.getElementById('grid').style.backgroundPosition = `0 ${-t * 14}px`;
+  scenes.forEach(s => {
+    const a = +s.dataset.s, b = +s.dataset.e, last = b >= DURATION;
+    if (t < a || t >= b) { s.style.display = 'none'; return; }
+    const o = Math.min(ease((t - a) / .3), last ? 1 : clamp((b - t) / .28));
+    s.style.display = 'flex'; s.style.opacity = o;
+    const out = last ? 0 : 1 - clamp((b - t) / .28);
+    s.style.transform = `translateY(${-out * 40}px) scale(${1 + (t - a) * .0035})`;
+  });
+  ins.forEach(e => {
+    const p = ease((t - +e.dataset.in) / .55);
+    e.style.opacity = p;
+    e.style.transform = e.dataset.fx === 'scale' ? `scale(${.82 + .18 * p})` : `translateY(${(1 - p) * 38}px)`;
+    if (e.dataset.fx === 'scale') e.style.transformOrigin = 'left center';
+  });
+  hls.forEach(e => {
+    const p = ease((t - +e.dataset.hl) / .6);
+    e.style.backgroundSize = (p * 100) + '% 100%';
+    e.style.color = p > .5 ? '#10131f' : '';
+  });
+  brs.forEach(e => e.style.width = (ease((t - +e.dataset.at) / .9) * +e.dataset.bar) + '%');
+  cnts.forEach(e => {
+    const v = ease((t - +e.dataset.at) / .9) * +e.dataset.count, dec = +(e.dataset.dec || 0);
+    let s = v.toFixed(dec);
+    if (e.dataset.sep) s = Math.round(v).toLocaleString('en-US');
+    e.textContent = s;
+  });
+  tline.style.strokeDashoffset = tlen * (1 - ease((t - 16.6) / 1.1));
+  pts.forEach(e => e.style.opacity = ease((t - +e.dataset.at) / .35));
+};
+const qs = new URLSearchParams(location.search);
+if (qs.has('t')) seek(+qs.get('t'));
+else { const t0 = performance.now(); (function loop() { seek(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); })(); }
+</script>
+</body>
+</html>
